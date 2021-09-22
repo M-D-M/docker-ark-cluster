@@ -1,0 +1,18 @@
+services:
+  TITANSCORCHED:
+    container_name: ${__ARKINSTANCE}
+    image: titanark
+    env_file: 
+    - TITANSCORCHED.cfg
+    command: bash -c "/controlARK.bash start"
+    ports:
+      - "${__ARKPORTMAPPING}:${__ARKPORTMAPPING}/udp"
+      - "${__ARKQPORT}:${__ARKQPORT}/udp"
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+    volumes:
+      - /home/steamuser/bin/ARK:/ARK
+      - /home/steamuser/ARK_Saved_Worlds/NewTitanCluster:/ARK_WORLDS
+      - /mnt/Cloud/ARK:/ARK_BACKUP
