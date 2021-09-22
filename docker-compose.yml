@@ -13,6 +13,5 @@ services:
         condition: on-failure
         max_attempts: 3
     volumes:
-      - /home/steamuser/bin/ARK:/ARK
-      - /home/steamuser/ARK_Saved_Worlds/NewTitanCluster:/ARK_WORLDS
-      - /mnt/Cloud/ARK:/ARK_BACKUP
+      - "/home/steamuser/bin/ARK:/ARK"
+      - "/mnt/Cloud/ARK:/ARK_BACKUP"
