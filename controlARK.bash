@@ -5,7 +5,7 @@ _ARKBIN=${_ARKBINLOC}/ShooterGame/Binaries/Linux/ShooterGameServer
 _ARKCONFIGSTRING="${__ARKMAP}?SessionName=${__ARKINSTANCE}?Port=${__ARKPORT}?QueryPort=${__ARKQPORT}?AltSaveDirectoryName=${__ARKINSTANCE}?OverrideStructurePlatformPrevention=True -NoTransferFromFiltering -servergamelog -server -log -clusterid=${__ARKCLUSTER}"
 _ARKBACKUPDIR="/ARK_BACKUP"
 # _ARKSCREEN="${__ARKINSTANCE}-screen"
-_ARKWORLDDIR="/ARK/ShooterGame/Saved"
+_ARKWORLDDIR="${_ARKBINLOC}/ShooterGame/Saved"
 
 STEAM_bin=/home/steam/steamcmd
 STEAM_updateCmd="${STEAM_bin} +login anonymous +force_install_dir ${_ARKBINLOC} +app_update 376030 validate +quit"

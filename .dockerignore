@@ -1,5 +1,6 @@
 .env.*
-docker-compose.yml
+*.yml
+*.cfg
 .DS_Store
 *.swp
 *~
