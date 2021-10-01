@@ -1,6 +1,6 @@
 .env
-*.yml
-*.cfg
+**.yml
+**.cfg
 .DS_Store
-*.swp
-*~
+**.swp
+**~
