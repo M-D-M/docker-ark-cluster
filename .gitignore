@@ -1,5 +1,4 @@
 .env
-.env.*
 *.yml
 *.cfg
 .DS_Store
