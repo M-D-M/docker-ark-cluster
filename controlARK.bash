@@ -7,7 +7,7 @@ _ARKBACKUPDIR="/ARK_BACKUP"
 # _ARKSCREEN="${__ARKINSTANCE}-screen"
 _ARKWORLDDIR="${_ARKBINLOC}/ShooterGame/Saved"
 
-STEAM_bin=/home/steam/steamcmd
+STEAM_bin=/home/steam/steamcmd/steamcmd.sh
 STEAM_updateCmd="${STEAM_bin} +login anonymous +force_install_dir ${_ARKBINLOC} +app_update 376030 validate +quit"
 
 SYS_lockfile=/tmp/${__ARKINSTANCE}_lockfile
@@ -39,7 +39,7 @@ main() {
 			startARKServer
 			;;
 		"backup")
-			backupARKServer &
+			backupARKServer
 			;;
 		"info")
 			getInfo
@@ -69,15 +69,25 @@ printUsageMessage() {
 }
 
 backupARKServer() {
-	echo "Backing up server files in background..."
-	zip -qr "/tmp/${__ARKINSTANCE}_Saved.zip" ${_ARKWORLDDIR}/
+	# Backup logs
+	echo "Backing up logs..."
+	backupLogs
+
+	Backup_Name=${__ARKINSTANCE}
+	if [[ -z "${__ARKINSTANCE}" ]]; then
+		echo "No ARKINSTANCE name passed; using generic term CLUSTER..."
+		Backup_Name="CLUSTER"
+	fi
+
+	echo "Backing up server files..."
+	zip -qr "/tmp/${Backup_Name}_Saved.zip" ${_ARKWORLDDIR}/
 
 	echo "Copying files to remote backup..."
-	#rclone -q sync /tmp/${__ARKINSTANCE}_Saved.zip ${_ARKBACKUPDIR}
-	rsync -a "/tmp/${__ARKINSTANCE}_Saved.zip" ${_ARKBACKUPDIR}/
+	#rclone -q sync /tmp/${Backup_Name}_Saved.zip ${_ARKBACKUPDIR}
+	rsync -a "/tmp/${Backup_Name}_Saved.zip" ${_ARKBACKUPDIR}/
 
 	echo "Removing backup file..."
-	rm "/tmp/${__ARKINSTANCE}_Saved.zip"
+	rm "/tmp/${Backup_Name}_Saved.zip"
 }
 
 startARKServer() {
@@ -107,33 +117,31 @@ stopARKServer() {
 	touch "${SYS_stopfile}"
 	
 	if [[ ${ARKInstance} ]]; then
-                echo "Current running ARK instance: ${ARKInstance}"
-                echo "Attempting to kill instance..."
-                kill "$ARKInstance" && sleep 2
+		echo "Current running ARK instance: ${ARKInstance}"
+		echo "Attempting to kill instance..."
+		kill "$ARKInstance" && sleep 2
 
-                # System takes a bit to actually remove the running instance
-                while [[ $(getARKInstance) ]]
-                do
-                        echo "Instance still running..."
-                        sleep 2
-                done
-
-		# Backup logs
-		# backupLogsForWorld
-        fi
+		# System takes a bit to actually remove the running instance
+		while [[ $(getARKInstance) ]]
+		do
+				echo "Instance still running..."
+				sleep 2
+		done
+    fi
 
 	echo "Instance shut down...."
 }
 
 updateARKServer() {
 	if [ ! -e "${SYS_lockfile}" ]; then
+		echo "Beginning update..."
 		touch "${SYS_lockfile}"
 
-		$STEAM_updateCmd
+		retVal=$($STEAM_updateCmd)
 
-		while [ $? -ne 0 ]
+		while [[ $retVal -ne 0 ]]
 		do
-			$STEAM_updateCmd
+			retVal=$($STEAM_updateCmd)
 		done
 
 		rm "${SYS_lockfile}"
@@ -142,10 +150,13 @@ updateARKServer() {
 	fi
 }
 
-backupLogsForWorld() {
-	if [ -r ${_ARKWORLDDIR}/Logs ]; then
+backupLogs() {
+	retVal=$(ls ${_ARKWORLDDIR}/Logs/* &> /dev/null)
+	if [[ $retVal ]]; then
 		zip -q ${_ARKWORLDDIR}/Logs.zip ${_ARKWORLDDIR}/Logs/*
-		rm ${_ARKWORLDDIR}/Logs/*
+		rm -vf ${_ARKWORLDDIR}/Logs/*
+	else 
+		echo "No logs present! Nothing to archive."
 	fi
 }
 
