@@ -1,7 +1,7 @@
 services:
   First_World:
     container_name: First_World
-    image: titanark
+    image: arkimage
     environment:
       - __ARKINSTANCE=First_World
       - __ARKCLUSTER=${CLUSTER_NAME}
@@ -23,7 +23,7 @@ services:
 
   Second_World:
     container_name: Second_World
-    image: titanark
+    image: arkimage
     environment:
       - __ARKINSTANCE=Second_World
       - __ARKCLUSTER=${CLUSTER_NAME}
@@ -45,7 +45,7 @@ services:
 
   UPDATE:
     container_name: UPDATECONTAINER
-    image: titanark
+    image: arkimage
     command: bash -c "/controlARK.bash update"
     volumes:
       - ${ARK_INSTALL_DIR}
@@ -53,7 +53,7 @@ services:
 
   BACKUP:
     container_name: BACKUPCONTAINER
-    image: titanark
+    image: arkimage
     command: bash -c "/controlARK.bash backup"
     volumes:
       - ${ARK_INSTALL_DIR}
