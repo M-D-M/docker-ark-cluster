@@ -135,11 +135,11 @@ updateARKServer() {
 		echo "Beginning update..."
 		touch "${SYS_lockfile}"
 
-		retVal=$($STEAM_updateCmd)
+		$STEAM_updateCmd
 
-		while [[ $retVal -ne 0 ]]
+		while [[ $? -ne 0 ]]
 		do
-			retVal=$($STEAM_updateCmd)
+			$STEAM_updateCmd
 		done
 
 		rm "${SYS_lockfile}"
