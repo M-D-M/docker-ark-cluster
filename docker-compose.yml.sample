@@ -1,7 +1,46 @@
+x-common: &common
+  image: titanark
+  volumes:
+    - type: bind
+      source: ${ARK_INSTALL_DIR}
+      target: /ARK
+
+x-world: &world
+  command: bash -c "/controlARK.bash start"
+  deploy:
+    restart_policy:
+      condition: on-failure
+      max_attempts: 3
+
+x-backup: &backup
+  image: titanark
+  volumes:
+    - type: bind
+      source: ${ARK_INSTALL_DIR}
+      target: /ARK
+    - type: bind
+      source: ${ARK_BACKUP_DIR}
+      target: /ARK_BACKUP
+
 services:
+  UPDATE:
+    container_name: TITANUPDATE
+    <<: *common
+    command: bash -c "/controlARK.bash update"
+
+  BACKUP:
+    container_name: TITANBACKUP
+    <<: *backup
+    command: bash -c "/controlARK.bash backup"
+
+  #######################################
+  ###  Configure ARK worlds below here
+  #######################################
+
   First_World:
     container_name: First_World
-    image: arkimage
+    <<: *common
+    <<: *world
     environment:
       - __ARKINSTANCE=First_World
       - __ARKCLUSTER=${CLUSTER_NAME}
@@ -9,21 +48,14 @@ services:
       - __ARKPORT=7777
       - __ARKPORTMAPPING=7777-7778
       - __ARKQPORT=27015
-    command: bash -c "/controlARK.bash start"
     ports:
       - "7777-7778:7777-7778/udp"
       - "27015:27015/udp"
-    deploy:
-      restart_policy:
-        condition: on-failure
-        max_attempts: 3
-    volumes:
-      - ${ARK_INSTALL_DIR}
-      - ${ARK_BACKUP_CLOUD_DIR}
 
   Second_World:
     container_name: Second_World
-    image: arkimage
+    <<: *common
+    <<: *world
     environment:
       - __ARKINSTANCE=Second_World
       - __ARKCLUSTER=${CLUSTER_NAME}
@@ -31,30 +63,6 @@ services:
       - __ARKPORT=7779
       - __ARKPORTMAPPING=7779-7780
       - __ARKQPORT=27017
-    command: bash -c "/controlARK.bash start"
     ports:
       - "7779-7780:7779-7780/udp"
       - "27017:27017/udp"
-    deploy:
-      restart_policy:
-        condition: on-failure
-        max_attempts: 3
-    volumes:
-      - ${ARK_INSTALL_DIR}
-      - ${ARK_BACKUP_CLOUD_DIR}
-
-  UPDATE:
-    container_name: UPDATECONTAINER
-    image: arkimage
-    command: bash -c "/controlARK.bash update"
-    volumes:
-      - ${ARK_INSTALL_DIR}
-      - ${ARK_BACKUP_CLOUD_DIR}
-
-  BACKUP:
-    container_name: BACKUPCONTAINER
-    image: arkimage
-    command: bash -c "/controlARK.bash backup"
-    volumes:
-      - ${ARK_INSTALL_DIR}
-      - ${ARK_BACKUP_CLOUD_DIR}
