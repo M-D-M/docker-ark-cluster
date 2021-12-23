@@ -7,7 +7,7 @@ _ARKBACKUPDIR="/ARK_BACKUP"
 _ARKWORLDDIR="${_ARKBINLOC}/ShooterGame/Saved"
 
 STEAM_bin=/home/steam/steamcmd/steamcmd.sh
-STEAM_updateCmd="${STEAM_bin} +login anonymous +force_install_dir ${_ARKBINLOC} +app_update 376030 validate +quit"
+STEAM_updateCmd="${STEAM_bin} +force_install_dir ${_ARKBINLOC} +login anonymous +app_update 376030 validate +quit"
 
 SYS_lockfile=/tmp/${__ARKINSTANCE}_lockfile
 SYS_stopfile=/tmp/${__ARKINSTANCE}_stopfile
