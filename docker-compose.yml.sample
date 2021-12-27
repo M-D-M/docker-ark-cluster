@@ -1,5 +1,9 @@
+#######################################
+###  Common ARK compose code, do not change
+#######################################
+
 x-common: &common
-  image: titanark
+  image: ${TITAN_IMAGE_NAME}
   volumes:
     - type: bind
       source: ${ARK_INSTALL_DIR}
@@ -11,9 +15,15 @@ x-world: &world
     restart_policy:
       condition: on-failure
       max_attempts: 3
+  healthcheck:
+      test: ["CMD", "pgrep", "-f", "ShooterGameServer"]
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+      start_period: 2m
 
 x-backup: &backup
-  image: titanark
+  image: ${TITAN_IMAGE_NAME}
   volumes:
     - type: bind
       source: ${ARK_INSTALL_DIR}
@@ -23,15 +33,24 @@ x-backup: &backup
       target: /ARK_BACKUP
 
 services:
+  BUILD:
+    build:
+      context: .
+    image: ${TITAN_IMAGE_NAME}
+
   UPDATE:
     container_name: TITANUPDATE
     <<: *common
     command: bash -c "/controlARK.bash update"
+    environment:
+      - __DEBUG=${DEBUG}
 
   BACKUP:
     container_name: TITANBACKUP
     <<: *backup
     command: bash -c "/controlARK.bash backup"
+    environment:
+      - __DEBUG=${DEBUG}
 
   #######################################
   ###  Configure ARK worlds below here
@@ -48,6 +67,7 @@ services:
       - __ARKPORT=7777
       - __ARKPORTMAPPING=7777-7778
       - __ARKQPORT=27015
+      - __DEBUG=${DEBUG}
     ports:
       - "7777-7778:7777-7778/udp"
       - "27015:27015/udp"
@@ -63,6 +83,7 @@ services:
       - __ARKPORT=7779
       - __ARKPORTMAPPING=7779-7780
       - __ARKQPORT=27017
+      - __DEBUG=${DEBUG}
     ports:
       - "7779-7780:7779-7780/udp"
       - "27017:27017/udp"
