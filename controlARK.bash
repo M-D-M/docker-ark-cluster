@@ -92,8 +92,10 @@ startARKServer() {
 	ARKInstance=$(getARKInstance)
 
 	# Output some beginning information to help with any debugging
-	env
-	ps faux
+	if [[ ${__DEBUG} != "True" ]]; then
+		env
+		ps faux
+	fi
 
 	if [[ ${ARKInstance} ]]; then
 		echo "ARK already running (pid ${ARKInstance})..."
